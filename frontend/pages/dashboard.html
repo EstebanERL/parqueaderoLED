@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard · Parqueadero</title>
+<link rel="stylesheet" href="../css/styles.css">
+</head><body>
+<div id="nav"></div>
+<div class="container">
+  <h1>Panel de control</h1>
+  <div class="grid" id="cupos"></div>
+
+  <div style="margin-top:24px" class="card">
+    <h2>Vehículos dentro ahora</h2>
+    <table><thead><tr>
+      <th>Placa</th><th>Tipo</th><th>Espacio</th><th>Entrada</th><th></th>
+    </tr></thead><tbody id="tblActivos"><tr><td colspan="5">Cargando…</td></tr></tbody></table>
+  </div>
+</div>
+<a class="whatsapp-fab" href="https://wa.me/573000000000?text=Hola,%20necesito%20ayuda%20con%20el%20parqueadero"
+   target="_blank" rel="noopener" title="Soporte por WhatsApp">💬</a>
+<script src="../js/api.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+requireAuth();
+renderNav('dashboard');
+
+async function cargar() {
+  const [cupos, activos] = await Promise.all([api('/cupos'), api('/registros/activos')]);
+  document.getElementById('cupos').innerHTML = cupos.map(c => `
+    <div class="stat ${c.disponibles > 0 ? 'green' : 'amber'}">
+      <div class="label">${c.categoria === 'auto' ? '🚗 Autos' : '🏍️ Motos'}</div>
+      <div class="value">${c.disponibles} / ${c.capacidad}</div>
+      <div style="color:var(--muted);font-size:.85rem">disponibles</div>
+    </div>`).join('');
+
+  const tb = document.getElementById('tblActivos');
+  tb.innerHTML = activos.length ? activos.map(a => `
+    <tr>
+      <td><strong>${a.placa}</strong></td>
+      <td><span class="badge ${a.categoria}">${a.tipo}</span></td>
+      <td>${a.espacio || '—'}</td>
+      <td>${fmtDate(a.hora_entrada)}</td>
+      <td><a class="btn success" href="salida.html?placa=${a.placa}">Registrar salida</a></td>
+    </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--muted)">No hay vehículos dentro</td></tr>';
+}
+cargar().catch(e => alert(e.message));
+setInterval(cargar, 15000);
+</script>
+</body></html>

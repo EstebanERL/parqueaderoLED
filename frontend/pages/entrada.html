@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrada · Parqueadero</title>
+<link rel="stylesheet" href="../css/styles.css">
+</head><body>
+<div id="nav"></div>
+<div class="container">
+  <h1>Registrar entrada</h1>
+  <div class="card" style="max-width:480px">
+    <div id="msg"></div>
+    <form id="form">
+      <div style="margin-bottom:14px">
+        <label>Placa</label>
+        <input id="placa" required maxlength="10" style="text-transform:uppercase" placeholder="ABC123">
+      </div>
+      <div style="margin-bottom:18px">
+        <label>Tipo de vehículo</label>
+        <select id="tipo" required></select>
+      </div>
+      <button class="btn success" type="submit">Registrar entrada</button>
+    </form>
+  </div>
+</div>
+<script src="../js/api.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+requireAuth();
+renderNav('entrada');
+
+(async () => {
+  const tipos = await api('/vehiculos/tipos');
+  document.getElementById('tipo').innerHTML = tipos.map(t =>
+    `<option value="${t.id}">${t.nombre} (${t.categoria})</option>`).join('');
+})();
+
+document.getElementById('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById('msg'); msg.innerHTML = '';
+  try {
+    const r = await api('/registros/entrada', {
+      method: 'POST',
+      body: {
+        placa: document.getElementById('placa').value.toUpperCase().trim(),
+        tipo_vehiculo_id: Number(document.getElementById('tipo').value),
+      }
+    });
+    msg.innerHTML = `<div class="success">✅ Entrada registrada — placa <b>${r.placa}</b>${r.espacio_id ? ', espacio asignado' : ''}</div>`;
+    document.getElementById('form').reset();
+  } catch (err) {
+    msg.innerHTML = `<div class="error">${err.message}</div>`;
+  }
+});
+</script>
+</body></html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login · Parqueadero</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="login-wrap">
+  <form class="login-card" id="loginForm">
+    <h1>🅿️ Parqueadero</h1>
+    <p class="sub">Inicia sesión para continuar</p>
+    <div id="err" class="error hidden"></div>
+    <div style="margin-bottom:14px">
+      <label>Email</label>
+      <input type="email" id="email" required value="admin@parqueadero.com">
+    </div>
+    <div style="margin-bottom:18px">
+      <label>Contraseña</label>
+      <input type="password" id="password" required value="admin123">
+    </div>
+    <button class="btn" style="width:100%" type="submit">Entrar</button>
+    <p style="text-align:center; color:var(--muted); font-size:.8rem; margin-top:16px">
+      Demo: admin@parqueadero.com / admin123
+    </p>
+  </form>
+</div>
+<script src="js/api.js"></script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const err = document.getElementById('err');
+  err.classList.add('hidden');
+  try {
+    const data = await api('/auth/login', {
+      method: 'POST', auth: false,
+      body: {
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value,
+      }
+    });
+    setSession(data.token, data.usuario);
+    window.location.href = './pages/dashboard.html';
+  } catch (e) {
+    err.textContent = e.message;
+    err.classList.remove('hidden');
+  }
+});
+</script>
+</body>
+</html>

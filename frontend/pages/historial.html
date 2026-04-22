@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Historial · Parqueadero</title>
+<link rel="stylesheet" href="../css/styles.css">
+</head><body>
+<div id="nav"></div>
+<div class="container">
+  <h1>Historial de registros</h1>
+  <div class="card" style="padding:0;overflow:auto">
+    <table><thead><tr>
+      <th>Placa</th><th>Tipo</th><th>Entrada</th><th>Salida</th>
+      <th>Min</th><th>Total</th><th>Estado</th><th>Ticket</th>
+    </tr></thead><tbody id="tbl"><tr><td colspan="8">Cargando…</td></tr></tbody></table>
+  </div>
+</div>
+<script src="../js/api.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+requireAuth(); renderNav('historial');
+api('/registros/historial').then(rows => {
+  document.getElementById('tbl').innerHTML = rows.length ? rows.map(r => `
+    <tr>
+      <td><b>${r.placa}</b></td>
+      <td>${r.tipo}</td>
+      <td>${fmtDate(r.hora_entrada)}</td>
+      <td>${fmtDate(r.hora_salida)}</td>
+      <td>${r.minutos_total ?? '—'}</td>
+      <td>${r.valor_pagar != null ? money(r.valor_pagar) : '—'}</td>
+      <td><span class="badge ${r.estado}">${r.estado}</span></td>
+      <td>${r.ticket_codigo || '—'}</td>
+    </tr>`).join('') : '<tr><td colspan="8" style="text-align:center;color:var(--muted)">Sin registros</td></tr>';
+}).catch(e => alert(e.message));
+</script>
+</body></html>
