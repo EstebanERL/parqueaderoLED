@@ -256,7 +256,7 @@ input:focus, select:focus, textarea:focus {
 .sidebar .logout:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
 
 /* Main */
-.main { display: flex; flex-direction: column; min-width: 0; background: rgba(0, 0, 0, 0.137);}
+.main { display: flex; flex-direction: column; min-width: 0; background: rgba(75, 74, 105, 0.075);}
 
 .topbar {
   height: var(--topbar-h);
