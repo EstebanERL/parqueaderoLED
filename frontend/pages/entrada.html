@@ -6,23 +6,37 @@
 </head><body>
 <div id="nav"></div>
 <div class="container">
-  <h1><i class="fas fa-right-to-bracket" style="color:var(--success)"></i> Registrar entrada</h1>
-  <p style="color:var(--muted);margin-top:-12px;margin-bottom:24px">Captura la placa y el tipo de vehículo para asignar un espacio.</p>
-  <div class="card" style="max-width:520px">
-    <div id="msg"></div>
-    <form id="form">
-      <div style="margin-bottom:16px">
-        <label><i class="fas fa-id-card"></i> Placa</label>
-        <input id="placa" required maxlength="10" style="text-transform:uppercase;letter-spacing:.1em;font-weight:600" placeholder="ABC123">
-      </div>
-      <div style="margin-bottom:22px">
-        <label><i class="fas fa-car"></i> Tipo de vehículo</label>
-        <select id="tipo" required></select>
-      </div>
-      <button class="btn success" type="submit" style="width:100%">
-        <i class="fas fa-check"></i> Registrar entrada
-      </button>
-    </form>
+  <div class="page-head">
+    <div>
+      <h1><i class="fas fa-right-to-bracket" style="color:var(--success)"></i> Registrar entrada</h1>
+      <p class="lead">Captura la placa y el tipo de vehículo para asignar un espacio automáticamente.</p>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;align-items:start">
+    <div class="card">
+      <div id="msg"></div>
+      <form id="form">
+        <div style="margin-bottom:18px">
+          <label><i class="fas fa-id-card"></i> Placa del vehículo</label>
+          <input id="placa" required maxlength="10" style="text-transform:uppercase;letter-spacing:.15em;font-weight:700;font-size:1.05rem;text-align:center" placeholder="ABC123">
+        </div>
+        <div style="margin-bottom:24px">
+          <label><i class="fas fa-car"></i> Tipo de vehículo</label>
+          <select id="tipo" required></select>
+        </div>
+        <button class="btn success" type="submit" style="width:100%;padding:13px">
+          <i class="fas fa-check"></i> Registrar entrada
+        </button>
+      </form>
+    </div>
+    <div class="card" style="background:var(--grad-dark);color:#cbd5e1;border:none">
+      <h2 style="color:#fff"><i class="fas fa-circle-info" style="color:var(--primary-glow)"></i> Tips</h2>
+      <ul style="margin:0;padding-left:18px;line-height:1.9;font-size:.9rem">
+        <li>La placa se convierte en mayúsculas automáticamente.</li>
+        <li>El sistema asigna el primer espacio libre.</li>
+        <li>Si no hay cupos, se notificará en pantalla.</li>
+      </ul>
+    </div>
   </div>
 </div>
 <script src="../js/api.js"></script>
@@ -48,7 +62,7 @@ document.getElementById('form').addEventListener('submit', async (e) => {
         tipo_vehiculo_id: Number(document.getElementById('tipo').value),
       }
     });
-    msg.innerHTML = `<div class="success">✅ Entrada registrada — placa <b>${r.placa}</b>${r.espacio_id ? ', espacio asignado' : ''}</div>`;
+    msg.innerHTML = `<div class="success">Entrada registrada — placa <b>${r.placa}</b>${r.espacio_id ? ', espacio asignado' : ''}</div>`;
     document.getElementById('form').reset();
   } catch (err) {
     msg.innerHTML = `<div class="error">${err.message}</div>`;

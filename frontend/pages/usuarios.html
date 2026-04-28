@@ -6,29 +6,33 @@
 </head><body>
 <div id="nav"></div>
 <div class="container">
-  <h1><i class="fas fa-users-gear" style="color:var(--primary)"></i> Gestión de usuarios</h1>
-  <p style="color:var(--muted);margin-top:-12px;margin-bottom:24px">Crea y administra los operarios y administradores del sistema.</p>
-  <div id="msg"></div>
-  <div class="card" style="max-width:620px;margin-bottom:28px">
-    <h2><i class="fas fa-user-plus" style="color:var(--success)"></i> Crear usuario</h2>
-    <form id="f">
-      <div class="row">
-        <div><label>Nombre</label><input id="nombre" required></div>
-        <div><label>Email</label><input id="email" type="email" required></div>
-      </div>
-      <div class="row" style="margin-top:12px">
-        <div><label>Contraseña</label><input id="password" type="password" required minlength="6"></div>
-        <div><label>Rol</label>
-          <select id="rol"><option value="operario">operario</option><option value="administrador">administrador</option></select>
-        </div>
-      </div>
-      <button class="btn" style="margin-top:18px" type="submit"><i class="fas fa-check"></i> Crear</button>
-    </form>
+  <div class="page-head">
+    <div>
+      <h1><i class="fas fa-users-gear" style="color:var(--primary)"></i> Gestión de usuarios</h1>
+      <p class="lead">Crea y administra los operarios y administradores del sistema.</p>
+    </div>
   </div>
-  <div class="card" style="padding:0;overflow:auto">
-    <table><thead><tr>
-      <th>Nombre</th><th>Email</th><th>Rol</th><th>Estado</th><th>Creado</th><th></th>
-    </tr></thead><tbody id="tbl"></tbody></table>
+  <div id="msg"></div>
+  <div style="display:grid;grid-template-columns:380px 1fr;gap:24px;align-items:start">
+    <div class="card">
+      <h2><i class="fas fa-user-plus" style="color:var(--success)"></i> Crear usuario</h2>
+      <form id="f">
+        <div style="margin-bottom:12px"><label>Nombre</label><input id="nombre" required></div>
+        <div style="margin-bottom:12px"><label>Email</label><input id="email" type="email" required></div>
+        <div class="row">
+          <div><label>Contraseña</label><input id="password" type="password" required minlength="6"></div>
+          <div><label>Rol</label>
+            <select id="rol"><option value="operario">operario</option><option value="administrador">administrador</option></select>
+          </div>
+        </div>
+        <button class="btn success" style="margin-top:18px;width:100%" type="submit"><i class="fas fa-check"></i> Crear usuario</button>
+      </form>
+    </div>
+    <div class="card" style="padding:0;overflow:auto">
+      <table><thead><tr>
+        <th>Nombre</th><th>Email</th><th>Rol</th><th>Estado</th><th>Creado</th><th></th>
+      </tr></thead><tbody id="tbl"></tbody></table>
+    </div>
   </div>
 </div>
 <script src="../js/api.js"></script>
@@ -40,10 +44,12 @@ async function cargar() {
   const rows = await api('/usuarios');
   document.getElementById('tbl').innerHTML = rows.map(u => `
     <tr>
-      <td>${u.nombre}</td><td>${u.email}</td><td>${u.rol}</td>
-      <td>${u.activo ? '✅ activo' : '⛔ inactivo'}</td>
-      <td>${fmtDate(u.creado_en)}</td>
-      <td>${u.activo ? `<button class="btn danger" data-id="${u.id}"><i class="fas fa-ban"></i> Desactivar</button>` : ''}</td>
+      <td><b>${u.nombre}</b></td>
+      <td style="color:var(--text-soft)">${u.email}</td>
+      <td><span class="badge ${u.rol==='administrador'?'auto':''}">${u.rol}</span></td>
+      <td>${u.activo ? '<span class="badge finalizado"><i class="fas fa-check"></i> activo</span>' : '<span class="badge cancelado"><i class="fas fa-ban"></i> inactivo</span>'}</td>
+      <td style="color:var(--text-soft)">${fmtDate(u.creado_en)}</td>
+      <td>${u.activo ? `<button class="btn danger sm" data-id="${u.id}"><i class="fas fa-ban"></i> Desactivar</button>` : ''}</td>
     </tr>`).join('');
   document.querySelectorAll('button[data-id]').forEach(b => {
     b.addEventListener('click', async () => {
@@ -65,7 +71,7 @@ document.getElementById('f').addEventListener('submit', async (e) => {
       rol: document.getElementById('rol').value,
     }});
     document.getElementById('f').reset();
-    document.getElementById('msg').innerHTML = '<div class="success">Usuario creado</div>';
+    document.getElementById('msg').innerHTML = '<div class="success">Usuario creado correctamente</div>';
     cargar();
   } catch (err) {
     document.getElementById('msg').innerHTML = `<div class="error">${err.message}</div>`;

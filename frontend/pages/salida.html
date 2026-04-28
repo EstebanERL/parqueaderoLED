@@ -6,16 +6,18 @@
 </head><body>
 <div id="nav"></div>
 <div class="container">
-  <h1><i class="fas fa-right-from-bracket" style="color:var(--danger)"></i> Registrar salida</h1>
-  <p style="color:var(--muted);margin-top:-12px;margin-bottom:24px">Busca la placa, aplica descuento si corresponde y genera el ticket.</p>
-  <div class="card" style="max-width:560px">
+  <div class="page-head">
+    <div>
+      <h1><i class="fas fa-right-from-bracket" style="color:var(--danger)"></i> Registrar salida</h1>
+      <p class="lead">Busca la placa, aplica descuento si corresponde y genera el ticket de pago.</p>
+    </div>
+  </div>
+  <div class="card" style="max-width:620px">
     <div id="msg"></div>
-    <div style="margin-bottom:14px">
-      <label><i class="fas fa-magnifying-glass"></i> Buscar por placa</label>
-      <div style="display:flex;gap:10px">
-        <input id="placa" maxlength="10" style="text-transform:uppercase;letter-spacing:.1em;font-weight:600" placeholder="ABC123">
-        <button class="btn" id="btnBuscar"><i class="fas fa-search"></i> Buscar</button>
-      </div>
+    <label><i class="fas fa-magnifying-glass"></i> Buscar por placa</label>
+    <div style="display:flex;gap:10px;margin-bottom:6px">
+      <input id="placa" maxlength="10" style="text-transform:uppercase;letter-spacing:.15em;font-weight:700;text-align:center" placeholder="ABC123">
+      <button class="btn" id="btnBuscar"><i class="fas fa-search"></i> Buscar</button>
     </div>
     <div id="resultado"></div>
   </div>
@@ -44,12 +46,16 @@ async function buscar() {
   try {
     const r = await api('/registros/placa/' + encodeURIComponent(placa));
     res.innerHTML = `
-      <div class="card" style="background:var(--bg-soft);margin-top:14px;border:1px dashed var(--border)">
-        <p style="margin:0 0 6px"><b>Placa:</b> ${r.placa} — <b>Tipo:</b> ${r.tipo}</p>
-        <p style="margin:0 0 14px;color:var(--muted)"><b>Entrada:</b> ${fmtDate(r.hora_entrada)}</p>
+      <div style="background:var(--surface-soft);margin-top:18px;padding:20px;border-radius:14px;border:1px dashed var(--border-strong)">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+          <div><span style="color:var(--muted);font-size:.8rem">Placa</span><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.3rem;letter-spacing:.05em">${r.placa}</div></div>
+          <div><span style="color:var(--muted);font-size:.8rem">Tipo</span><div style="font-weight:600">${r.tipo}</div></div>
+          <div><span style="color:var(--muted);font-size:.8rem">Entrada</span><div style="font-weight:600">${fmtDate(r.hora_entrada)}</div></div>
+        </div>
+        <hr style="border:none;border-top:1px dashed var(--border-strong);margin:14px 0">
         <label>Descuento (opcional)</label>
         <input id="desc" type="number" min="0" value="0" style="margin-bottom:14px">
-        <button class="btn danger" id="btnSalida" style="width:100%"><i class="fas fa-receipt"></i> Confirmar salida y generar ticket</button>
+        <button class="btn danger" id="btnSalida" style="width:100%;padding:13px"><i class="fas fa-receipt"></i> Confirmar salida y generar ticket</button>
       </div>`;
     document.getElementById('btnSalida').addEventListener('click', () => salida(r.id));
   } catch (e) {

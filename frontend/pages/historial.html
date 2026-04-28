@@ -6,8 +6,12 @@
 </head><body>
 <div id="nav"></div>
 <div class="container">
-  <h1><i class="fas fa-clock-rotate-left" style="color:var(--primary)"></i> Historial de registros</h1>
-  <p style="color:var(--muted);margin-top:-12px;margin-bottom:24px">Todos los movimientos del parqueadero.</p>
+  <div class="page-head">
+    <div>
+      <h1><i class="fas fa-clock-rotate-left" style="color:var(--primary)"></i> Historial de registros</h1>
+      <p class="lead">Todos los movimientos del parqueadero, con tickets y totales.</p>
+    </div>
+  </div>
   <div class="card" style="padding:0;overflow:auto">
     <table><thead><tr>
       <th>Placa</th><th>Tipo</th><th>Entrada</th><th>Salida</th>
@@ -22,15 +26,15 @@ requireAuth(); renderNav('historial');
 api('/registros/historial').then(rows => {
   document.getElementById('tbl').innerHTML = rows.length ? rows.map(r => `
     <tr>
-      <td><b>${r.placa}</b></td>
+      <td><strong style="font-family:'Space Grotesk',sans-serif;letter-spacing:.05em">${r.placa}</strong></td>
       <td>${r.tipo}</td>
-      <td>${fmtDate(r.hora_entrada)}</td>
-      <td>${fmtDate(r.hora_salida)}</td>
+      <td style="color:var(--text-soft)">${fmtDate(r.hora_entrada)}</td>
+      <td style="color:var(--text-soft)">${fmtDate(r.hora_salida)}</td>
       <td>${r.minutos_total ?? '—'}</td>
-      <td>${r.valor_pagar != null ? money(r.valor_pagar) : '—'}</td>
+      <td style="font-weight:600">${r.valor_pagar != null ? money(r.valor_pagar) : '—'}</td>
       <td><span class="badge ${r.estado}">${r.estado}</span></td>
-      <td>${r.ticket_codigo || '—'}</td>
-    </tr>`).join('') : '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px">Sin registros</td></tr>';
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--muted)">${r.ticket_codigo || '—'}</td>
+    </tr>`).join('') : '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:32px"><i class="fas fa-inbox" style="font-size:1.5rem;display:block;margin-bottom:8px;opacity:.4"></i>Sin registros</td></tr>';
 }).catch(e => alert(e.message));
 </script>
 </body></html>

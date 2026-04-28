@@ -6,13 +6,25 @@
 </head><body>
 <div id="nav"></div>
 <div class="container">
-  <h1><i class="fas fa-gauge-high" style="color:var(--primary)"></i> Panel de control</h1>
-  <p style="color:var(--muted);margin-top:-12px;margin-bottom:24px">Resumen de cupos disponibles y vehículos en el parqueadero.</p>
+  <div class="page-head">
+    <div>
+      <h1>Panel de control</h1>
+      <p class="lead">Resumen en tiempo real de cupos disponibles y vehículos dentro.</p>
+    </div>
+    <div style="display:flex;gap:10px">
+      <a class="btn ghost" href="historial.html"><i class="fas fa-clock-rotate-left"></i> Historial</a>
+      <a class="btn" href="entrada.html"><i class="fas fa-plus"></i> Nueva entrada</a>
+    </div>
+  </div>
+
   <div class="grid" id="cupos"></div>
 
   <div style="margin-top:28px" class="card">
-    <h2><i class="fas fa-car-side" style="color:var(--primary)"></i> Vehículos dentro ahora</h2>
-    <div style="overflow:auto;margin:0 -28px -28px;border-radius:0 0 var(--radius) var(--radius)">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px">
+      <h2 style="margin:0"><i class="fas fa-car-side" style="color:var(--primary)"></i> Vehículos dentro ahora</h2>
+      <span class="badge"><i class="fas fa-arrows-rotate"></i> Actualiza cada 15s</span>
+    </div>
+    <div style="overflow:auto;margin:0 -24px -24px;border-radius:0 0 var(--radius) var(--radius)">
     <table><thead><tr>
       <th>Placa</th><th>Tipo</th><th>Espacio</th><th>Entrada</th><th></th>
     </tr></thead><tbody id="tblActivos"><tr><td colspan="5">Cargando…</td></tr></tbody></table>
@@ -29,22 +41,31 @@ renderNav('dashboard');
 
 async function cargar() {
   const [cupos, activos] = await Promise.all([api('/cupos'), api('/registros/activos')]);
-  document.getElementById('cupos').innerHTML = cupos.map(c => `
-    <div class="stat ${c.disponibles > 0 ? 'green' : 'amber'}">
-      <div class="label">${c.categoria === 'auto' ? '🚗 Autos' : '🏍️ Motos'}</div>
-      <div class="value">${c.disponibles} / ${c.capacidad}</div>
-      <div style="color:var(--muted);font-size:.85rem;margin-top:4px">disponibles</div>
-    </div>`).join('');
+  document.getElementById('cupos').innerHTML = cupos.map((c, idx) => {
+    const tone = c.disponibles > 0 ? 'green' : 'amber';
+    const isAuto = c.categoria === 'auto';
+    return `
+    <div class="stat ${tone}">
+      <div class="icon"><i class="fas ${isAuto?'fa-car':'fa-motorcycle'}"></i></div>
+      <div class="label">${isAuto ? 'Autos disponibles' : 'Motos disponibles'}</div>
+      <div class="value">${c.disponibles}<span style="color:var(--muted);font-size:1rem;font-weight:500"> / ${c.capacidad}</span></div>
+    </div>`;
+  }).join('') + `
+    <div class="stat violet">
+      <div class="icon"><i class="fas fa-car-side"></i></div>
+      <div class="label">Dentro ahora</div>
+      <div class="value">${activos.length}</div>
+    </div>`;
 
   const tb = document.getElementById('tblActivos');
   tb.innerHTML = activos.length ? activos.map(a => `
     <tr>
-      <td><strong>${a.placa}</strong></td>
+      <td><strong style="font-family:'Space Grotesk',sans-serif;letter-spacing:.05em">${a.placa}</strong></td>
       <td><span class="badge ${a.categoria}">${a.tipo}</span></td>
       <td>${a.espacio || '—'}</td>
-      <td>${fmtDate(a.hora_entrada)}</td>
-      <td><a class="btn success" href="salida.html?placa=${a.placa}"><i class="fas fa-right-from-bracket"></i> Registrar salida</a></td>
-    </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">No hay vehículos dentro</td></tr>';
+      <td style="color:var(--text-soft)">${fmtDate(a.hora_entrada)}</td>
+      <td><a class="btn success sm" href="salida.html?placa=${a.placa}"><i class="fas fa-right-from-bracket"></i> Salida</a></td>
+    </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:32px"><i class="fas fa-inbox" style="font-size:1.5rem;display:block;margin-bottom:8px;opacity:.4"></i>No hay vehículos dentro</td></tr>';
 }
 cargar().catch(e => alert(e.message));
 setInterval(cargar, 15000);
