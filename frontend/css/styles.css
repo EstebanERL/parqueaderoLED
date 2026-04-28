@@ -18,14 +18,14 @@
   --primary: #3b82f6;
   --primary-2: #06b6d4;
   --primary-glow: #60a5fa;
-  --success: #10b981;
-  --success-2: #34d399;
+  --success: #96ebcf;
+  --success-2: #5fc29e;
   --warning: #f59e0b;
   --danger: #ef4444;
   --danger-2: #f97316;
 
   --grad-primary: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
-  --grad-success: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  --grad-success: linear-gradient(135deg, #19382e 0%, #34d399 100%);
   --grad-danger:  linear-gradient(135deg, #ef4444 0%, #f97316 100%);
   --grad-violet:  linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
   --grad-dark:    linear-gradient(180deg, #0b1020 0%, #131a3a 100%);
@@ -256,10 +256,11 @@ input:focus, select:focus, textarea:focus {
 .sidebar .logout:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
 
 /* Main */
-.main { display: flex; flex-direction: column; min-width: 0; }
+.main { display: flex; flex-direction: column; min-width: 0; background: rgba(0, 0, 0, 0.137);}
+
 .topbar {
   height: var(--topbar-h);
-  background: rgba(255,255,255,.85);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
   display: flex; align-items: center; gap: 16px;
@@ -274,7 +275,7 @@ input:focus, select:focus, textarea:focus {
 }
 .topbar .crumb {
   font-family: 'Space Grotesk', sans-serif;
-  font-weight: 600; color: var(--text); font-size: 1.05rem;
+  font-weight: 600; color: var(--text); font-size: 1.05rem; 
 }
 .topbar .spacer { flex: 1; }
 .topbar .pill {
@@ -431,14 +432,26 @@ tbody tr:last-child td { border-bottom: none; }
 
 /* ============== FAB ============== */
 .whatsapp-fab {
-  position: fixed; bottom: 24px; right: 24px;
-  width: 56px; height: 56px; border-radius: 50%;
-  background: linear-gradient(135deg,#25d366,#128c7e);
-  color: #fff; display: flex; align-items: center; justify-content: center;
-  font-size: 1.6rem; text-decoration: none;
-  box-shadow: 0 12px 30px -8px rgba(37,211,102,.55);
-  transition: transform .2s ease;
-  z-index: 50;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 55px;
+  height: 55px;
+  background: #18ac53;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  z-index: 999;
+  transition: all 0.3s ease;
+}
+
+.whatsapp-fab:hover {
+  transform: scale(1.1);
+  background: #15793d;
 }
 .whatsapp-fab:hover { transform: scale(1.08); }
 
@@ -479,3 +492,4 @@ tbody tr:last-child td { border-bottom: none; }
   body { background: #fff; }
   .ticket { box-shadow: none; border: 1px dashed #000; }
 }
+

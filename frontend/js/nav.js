@@ -100,6 +100,17 @@ function renderNav(active) {
 
   // 🧹 Limpiar body
   document.body.innerHTML = '';
+  document.body.appendChild(layout);
+
+  // 📱 Botón flotante WhatsApp
+const whatsapp = document.createElement('a');
+whatsapp.href = "https://wa.me/573001234567"; // ← cambia tu número
+whatsapp.target = "_blank";
+whatsapp.className = "whatsapp-fab";
+
+whatsapp.innerHTML = `<i class="fab fa-whatsapp"></i>`;
+
+document.body.appendChild(whatsapp);
 
   // 🧩 Insertar layout
   document.body.appendChild(layout);
