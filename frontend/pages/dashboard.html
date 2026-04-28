@@ -6,18 +6,21 @@
 </head><body>
 <div id="nav"></div>
 <div class="container">
-  <h1>Panel de control</h1>
+  <h1><i class="fas fa-gauge-high" style="color:var(--primary)"></i> Panel de control</h1>
+  <p style="color:var(--muted);margin-top:-12px;margin-bottom:24px">Resumen de cupos disponibles y vehículos en el parqueadero.</p>
   <div class="grid" id="cupos"></div>
 
-  <div style="margin-top:24px" class="card">
-    <h2>Vehículos dentro ahora</h2>
+  <div style="margin-top:28px" class="card">
+    <h2><i class="fas fa-car-side" style="color:var(--primary)"></i> Vehículos dentro ahora</h2>
+    <div style="overflow:auto;margin:0 -28px -28px;border-radius:0 0 var(--radius) var(--radius)">
     <table><thead><tr>
       <th>Placa</th><th>Tipo</th><th>Espacio</th><th>Entrada</th><th></th>
     </tr></thead><tbody id="tblActivos"><tr><td colspan="5">Cargando…</td></tr></tbody></table>
+    </div>
   </div>
 </div>
 <a class="whatsapp-fab" href="https://wa.me/573000000000?text=Hola,%20necesito%20ayuda%20con%20el%20parqueadero"
-   target="_blank" rel="noopener" title="Soporte por WhatsApp">💬</a>
+   target="_blank" rel="noopener" title="Soporte por WhatsApp"><i class="fab fa-whatsapp"></i></a>
 <script src="../js/api.js"></script>
 <script src="../js/nav.js"></script>
 <script>
@@ -30,7 +33,7 @@ async function cargar() {
     <div class="stat ${c.disponibles > 0 ? 'green' : 'amber'}">
       <div class="label">${c.categoria === 'auto' ? '🚗 Autos' : '🏍️ Motos'}</div>
       <div class="value">${c.disponibles} / ${c.capacidad}</div>
-      <div style="color:var(--muted);font-size:.85rem">disponibles</div>
+      <div style="color:var(--muted);font-size:.85rem;margin-top:4px">disponibles</div>
     </div>`).join('');
 
   const tb = document.getElementById('tblActivos');
@@ -40,8 +43,8 @@ async function cargar() {
       <td><span class="badge ${a.categoria}">${a.tipo}</span></td>
       <td>${a.espacio || '—'}</td>
       <td>${fmtDate(a.hora_entrada)}</td>
-      <td><a class="btn success" href="salida.html?placa=${a.placa}">Registrar salida</a></td>
-    </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--muted)">No hay vehículos dentro</td></tr>';
+      <td><a class="btn success" href="salida.html?placa=${a.placa}"><i class="fas fa-right-from-bracket"></i> Registrar salida</a></td>
+    </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">No hay vehículos dentro</td></tr>';
 }
 cargar().catch(e => alert(e.message));
 setInterval(cargar, 15000);

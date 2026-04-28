@@ -6,19 +6,22 @@
 </head><body>
 <div id="nav"></div>
 <div class="container">
-  <h1>Registrar entrada</h1>
-  <div class="card" style="max-width:480px">
+  <h1><i class="fas fa-right-to-bracket" style="color:var(--success)"></i> Registrar entrada</h1>
+  <p style="color:var(--muted);margin-top:-12px;margin-bottom:24px">Captura la placa y el tipo de vehículo para asignar un espacio.</p>
+  <div class="card" style="max-width:520px">
     <div id="msg"></div>
     <form id="form">
-      <div style="margin-bottom:14px">
-        <label>Placa</label>
-        <input id="placa" required maxlength="10" style="text-transform:uppercase" placeholder="ABC123">
+      <div style="margin-bottom:16px">
+        <label><i class="fas fa-id-card"></i> Placa</label>
+        <input id="placa" required maxlength="10" style="text-transform:uppercase;letter-spacing:.1em;font-weight:600" placeholder="ABC123">
       </div>
-      <div style="margin-bottom:18px">
-        <label>Tipo de vehículo</label>
+      <div style="margin-bottom:22px">
+        <label><i class="fas fa-car"></i> Tipo de vehículo</label>
         <select id="tipo" required></select>
       </div>
-      <button class="btn success" type="submit">Registrar entrada</button>
+      <button class="btn success" type="submit" style="width:100%">
+        <i class="fas fa-check"></i> Registrar entrada
+      </button>
     </form>
   </div>
 </div>
