@@ -12,7 +12,7 @@ function getUser() {
 function logout() {
   localStorage.removeItem('pq_token');
   localStorage.removeItem('pq_user');
-  window.location.href = '/index.html';
+  window.location.href = '../index.html';
 }
 
 async function api(path, { method = 'GET', body, auth = true } = {}) {
@@ -29,10 +29,10 @@ async function api(path, { method = 'GET', body, auth = true } = {}) {
 
 function requireAuth(rolRequerido) {
   const u = getUser();
-  if (!getToken() || !u) { window.location.href = '/index.html'; return null; }
+  if (!getToken() || !u) { window.location.href = '../index.html'; return null; }
   if (rolRequerido && u.rol !== rolRequerido) {
     alert('No tienes permisos para acceder a esta sección');
-    window.location.href = '/pages/dashboard.html';
+    window.location.href = '../pages/dashboard.html';
     return null;
   }
   return u;
