@@ -1,5 +1,5 @@
 // Cliente HTTP del frontend. Ajusta API_URL si tu backend corre en otro host.
-const API_URL = window.API_URL_OVERRIDE || 'http://localhost:3000/api';
+const API_URL = window.API_URL_OVERRIDE || 'https://parqueaderoled.onrender.com';
 
 function getToken() { return localStorage.getItem('pq_token'); }
 function setSession(token, usuario) {
