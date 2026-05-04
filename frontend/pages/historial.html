@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Historial · Parqueadero</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="../css/styles.css">
+</head><body>
+<div id="nav"></div>
+<div class="container">
+  <div class="page-head">
+    <div>
+      <h1><i class="fas fa-clock-rotate-left" style="color:var(--primary)"></i> Historial de registros</h1>
+      <p class="lead">Todos los movimientos del parqueadero, con tickets y totales.</p>
+    </div>
+  </div>
+  <div class="card" style="padding:0;overflow:auto">
+    <table><thead><tr>
+      <th>Placa</th><th>Tipo</th><th>Entrada</th><th>Salida</th>
+      <th>Min</th><th>Total</th><th>Estado</th><th>Ticket</th>
+    </tr></thead><tbody id="tbl"><tr><td colspan="8">Cargando…</td></tr></tbody></table>
+  </div>
+</div>
+<script src="../js/api.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+requireAuth(); renderNav('historial');
+api('/registros/historial').then(rows => {
+  document.getElementById('tbl').innerHTML = rows.length ? rows.map(r => `
+    <tr>
+      <td><strong style="font-family:'Space Grotesk',sans-serif;letter-spacing:.05em">${r.placa}</strong></td>
+      <td>${r.tipo}</td>
+      <td style="color:var(--text-soft)">${fmtDate(r.hora_entrada)}</td>
+      <td style="color:var(--text-soft)">${fmtDate(r.hora_salida)}</td>
+      <td>${r.minutos_total ?? '—'}</td>
+      <td style="font-weight:600">${r.valor_pagar != null ? money(r.valor_pagar) : '—'}</td>
+      <td><span class="badge ${r.estado}">${r.estado}</span></td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--muted)">${r.ticket_codigo || '—'}</td>
+    </tr>`).join('') : '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:32px"><i class="fas fa-inbox" style="font-size:1.5rem;display:block;margin-bottom:8px;opacity:.4"></i>Sin registros</td></tr>';
+}).catch(e => alert(e.message));
+</script>
+</body></html>

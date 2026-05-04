@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Usuarios · Parqueadero</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="../css/styles.css">
+</head><body>
+<div id="nav"></div>
+<div class="container">
+  <div class="page-head">
+    <div>
+      <h1><i class="fas fa-users-gear" style="color:var(--primary)"></i> Gestión de usuarios</h1>
+      <p class="lead">Crea y administra los operarios y administradores del sistema.</p>
+    </div>
+  </div>
+  <div id="msg"></div>
+  <div style="display:grid;grid-template-columns:380px 1fr;gap:24px;align-items:start">
+    <div class="card">
+      <h2><i class="fas fa-user-plus" style="color:var(--success)"></i> Crear usuario</h2>
+      <form id="f">
+        <div style="margin-bottom:12px"><label>Nombre</label><input id="nombre" required></div>
+        <div style="margin-bottom:12px"><label>Email</label><input id="email" type="email" required></div>
+        <div class="row">
+          <div><label>Contraseña</label><input id="password" type="password" required minlength="6"></div>
+          <div><label>Rol</label>
+            <select id="rol"><option value="operario">operario</option><option value="administrador">administrador</option></select>
+          </div>
+        </div>
+        <button class="btn success" style="margin-top:18px;width:100%" type="submit"><i class="fas fa-check"></i> Crear usuario</button>
+      </form>
+    </div>
+    <div class="card" style="padding:0;overflow:auto">
+      <table><thead><tr>
+        <th>Nombre</th><th>Email</th><th>Rol</th><th>Estado</th><th>Creado</th><th></th>
+      </tr></thead><tbody id="tbl"></tbody></table>
+    </div>
+  </div>
+</div>
+<script src="../js/api.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+requireAuth('administrador'); renderNav('usuarios');
+
+async function cargar() {
+  const rows = await api('/usuarios');
+  document.getElementById('tbl').innerHTML = rows.map(u => `
+    <tr>
+      <td><b>${u.nombre}</b></td>
+      <td style="color:var(--text-soft)">${u.email}</td>
+      <td><span class="badge ${u.rol==='administrador'?'auto':''}">${u.rol}</span></td>
+      <td>${u.activo ? '<span class="badge finalizado"><i class="fas fa-check"></i> activo</span>' : '<span class="badge cancelado"><i class="fas fa-ban"></i> inactivo</span>'}</td>
+      <td style="color:var(--text-soft)">${fmtDate(u.creado_en)}</td>
+      <td>${u.activo ? `<button class="btn danger sm" data-id="${u.id}"><i class="fas fa-ban"></i> Desactivar</button>` : ''}</td>
+    </tr>`).join('');
+  document.querySelectorAll('button[data-id]').forEach(b => {
+    b.addEventListener('click', async () => {
+      if (!confirm('¿Desactivar este usuario?')) return;
+      await api('/usuarios/' + b.dataset.id, { method: 'DELETE' });
+      cargar();
+    });
+  });
+}
+cargar();
+
+document.getElementById('f').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  try {
+    await api('/usuarios', { method: 'POST', body: {
+      nombre: document.getElementById('nombre').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      password: document.getElementById('password').value,
+      rol: document.getElementById('rol').value,
+    }});
+    document.getElementById('f').reset();
+    document.getElementById('msg').innerHTML = '<div class="success">Usuario creado correctamente</div>';
+    cargar();
+  } catch (err) {
+    document.getElementById('msg').innerHTML = `<div class="error">${err.message}</div>`;
+  }
+});
+</script>
+</body></html>

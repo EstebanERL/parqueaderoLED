@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrada · Parqueadero</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="../css/styles.css">
+</head><body>
+<div id="nav"></div>
+<div class="container">
+  <div class="page-head">
+    <div>
+      <h1><i class="fas fa-right-to-bracket" style="color:var(--success)"></i> Registrar entrada</h1>
+      <p class="lead">Captura la placa y el tipo de vehículo para asignar un espacio automáticamente.</p>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;align-items:start">
+    <div class="card">
+      <div id="msg"></div>
+      <form id="form">
+        <div style="margin-bottom:18px">
+          <label><i class="fas fa-id-card"></i> Placa del vehículo</label>
+          <input id="placa" required maxlength="10" style="text-transform:uppercase;letter-spacing:.15em;font-weight:700;font-size:1.05rem;text-align:center" placeholder="ABC123">
+        </div>
+        <div style="margin-bottom:24px">
+          <label><i class="fas fa-car"></i> Tipo de vehículo</label>
+          <select id="tipo" required></select>
+        </div>
+        <button class="btn success" type="submit" style="width:100%;padding:13px">
+          <i class="fas fa-check"></i> Registrar entrada
+        </button>
+      </form>
+    </div>
+    <div class="card" style="background:var(--grad-dark);color:#cbd5e1;border:none">
+      <h2 style="color:#fff"><i class="fas fa-circle-info" style="color:var(--primary-glow)"></i> Tips</h2>
+      <ul style="margin:0;padding-left:18px;line-height:1.9;font-size:.9rem">
+        <li>La placa se convierte en mayúsculas automáticamente.</li>
+        <li>El sistema asigna el primer espacio libre.</li>
+        <li>Si no hay cupos, se notificará en pantalla.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<script src="../js/api.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+requireAuth();
+renderNav('entrada');
+
+(async () => {
+  const tipos = await api('/vehiculos/tipos');
+  document.getElementById('tipo').innerHTML = tipos.map(t =>
+    `<option value="${t.id}">${t.nombre} (${t.categoria})</option>`).join('');
+})();
+
+document.getElementById('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById('msg'); msg.innerHTML = '';
+  try {
+    const r = await api('/registros/entrada', {
+      method: 'POST',
+      body: {
+        placa: document.getElementById('placa').value.toUpperCase().trim(),
+        tipo_vehiculo_id: Number(document.getElementById('tipo').value),
+      }
+    });
+    msg.innerHTML = `<div class="success">Entrada registrada — placa <b>${r.placa}</b>${r.espacio_id ? ', espacio asignado' : ''}</div>`;
+    document.getElementById('form').reset();
+  } catch (err) {
+    msg.innerHTML = `<div class="error">${err.message}</div>`;
+  }
+});
+</script>
+</body></html>

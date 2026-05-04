@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarifas · Parqueadero</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="../css/styles.css">
+</head><body>
+<div id="nav"></div>
+<div class="container">
+  <div class="page-head">
+    <div>
+      <h1><i class="fas fa-tags" style="color:var(--primary)"></i> Configuración de tarifas</h1>
+      <p class="lead">Solo administradores. Actualiza el valor y la unidad de cobro por tipo de vehículo.</p>
+    </div>
+  </div>
+  <div id="msg"></div>
+  <div class="card" style="padding:0;overflow:auto">
+    <table><thead><tr>
+      <th>Tipo</th><th>Categoría</th><th>Unidad</th><th>Valor</th><th>Fracción (min)</th><th></th>
+    </tr></thead><tbody id="tbl"></tbody></table>
+  </div>
+</div>
+<script src="../js/api.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+requireAuth('administrador'); renderNav('tarifas');
+
+async function cargar() {
+  const rows = await api('/tarifas');
+  document.getElementById('tbl').innerHTML = rows.map(r => `
+    <tr data-id="${r.id}">
+      <td><b>${r.tipo}</b></td>
+      <td><span class="badge ${r.categoria}">${r.categoria}</span></td>
+      <td>
+        <select class="unidad" style="padding:8px 10px;font-size:.85rem">
+          ${['minuto','hora','dia','fraccion'].map(u =>
+            `<option ${u===r.unidad?'selected':''}>${u}</option>`).join('')}
+        </select>
+      </td>
+      <td><input type="number" class="valor" value="${r.valor}" min="0" step="1" style="padding:8px 10px;font-size:.85rem;width:120px"></td>
+      <td><input type="number" class="frac" value="${r.valor_fraccion_minutos}" min="1" style="padding:8px 10px;font-size:.85rem;width:90px"></td>
+      <td><button class="btn sm save"><i class="fas fa-save"></i> Guardar</button></td>
+    </tr>`).join('');
+
+  document.querySelectorAll('.save').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const tr = e.target.closest('tr');
+      const id = tr.dataset.id;
+      try {
+        await api('/tarifas/' + id, { method: 'PUT', body: {
+          unidad: tr.querySelector('.unidad').value,
+          valor: Number(tr.querySelector('.valor').value),
+          valor_fraccion_minutos: Number(tr.querySelector('.frac').value),
+        }});
+        document.getElementById('msg').innerHTML = '<div class="success">Tarifa actualizada correctamente</div>';
+        setTimeout(() => document.getElementById('msg').innerHTML = '', 2500);
+      } catch (err) {
+        document.getElementById('msg').innerHTML = `<div class="error">${err.message}</div>`;
+      }
+    });
+  });
+}
+cargar();
+</script>
+</body></html>
