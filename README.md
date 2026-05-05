@@ -115,3 +115,4 @@ O simplemente abre `frontend/index.html` en el navegador (ajustando `API_URL` en
 ---
 
 Hecho con ❤️ — Sistema MVP. Amplía con descuentos, exportar PDF, WhatsApp, etc.
+BETA
