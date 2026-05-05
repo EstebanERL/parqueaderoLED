@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iniciar sesión · Parqueadero SaaS</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<meta name="description" content="Sistema profesional de gestión de parqueaderos. Controla cupos, entradas, salidas y tarifas en tiempo real.">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="login-wrap">
+  <section class="login-hero">
+    <div class="brand-row">
+      <img src="img/logo.png" alt="Logo Parqueadero">
+      <span>Parqueadero <span style="color:#60a5fa">Cloud</span></span>
+    </div>
+    <div class="pitch">
+      <h2>Gestiona tu<br>parqueadero como<br>un profesional.</h2>
+      <p>Plataforma moderna para registrar entradas, salidas, generar tickets y monitorear cupos en tiempo real desde cualquier dispositivo.</p>
+      <div class="features">
+        <div><i class="fas fa-bolt"></i> Tiempo real</div>
+        <div><i class="fas fa-shield-halved"></i> Seguro</div>
+        <div><i class="fas fa-mobile-screen"></i> Responsive</div>
+        <div><i class="fas fa-chart-line"></i> Reportes</div>
+      </div>
+    </div>
+    <div style="color:#64748b;font-size:.8rem">© 2026 Parqueadero · Todos los derechos reservados</div>
+  </section>
+
+  <section class="login-side">
+    <form class="login-card" id="loginForm">
+      <h1><i class="fas fa-square-parking"></i> Bienvenido</h1>
+      <p class="sub">Ingresa tus credenciales para continuar</p>
+      <div id="err" class="error hidden"></div>
+      <div style="margin-bottom:16px">
+        <label><i class="far fa-envelope"></i> Correo electrónico</label>
+        <input type="email" id="email" required value="admin@parqueadero.com" autocomplete="email" placeholder="tu@correo.com">
+      </div>
+      <div style="margin-bottom:22px">  
+        <label><i class="fas fa-lock"></i> Contraseña</label>
+        <input type="password" id="password" required value="admin123" autocomplete="current-password" placeholder="••••••••">
+      </div>
+      <button class="btn" style="width:100%;padding:13px" type="submit">
+        <i class="fas fa-arrow-right-to-bracket"></i> Iniciar sesión
+      </button>
+      <div style="display:flex;align-items:center;gap:10px;margin:22px 0 14px;color:var(--muted);font-size:.8rem">
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <span>credenciales demo</span>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+      <div style="text-align:center;color:var(--text-soft);font-size:.82rem;background:var(--surface-soft);padding:10px;border-radius:10px;border:1px dashed var(--border-strong)">
+        <b>admin@parqueadero.com</b> / <b>admin123</b>
+      </div>
+    </form>
+  </section>
+</div>
+<script src="js/api.js"></script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const err = document.getElementById('err');
+  const btn = e.target.querySelector('button');
+  err.classList.add('hidden');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+  try {
+    const data = await api('/api/auth/login', { 
+      method: 'POST', auth: false,
+      body: {
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value,
+      }
+    });
+    setSession(data.token, data.usuario);
+    window.location.href = './pages/dashboard.html';
+  } catch (e) {
+    err.textContent = e.message;
+    err.classList.remove('hidden');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-arrow-right-to-bracket"></i> Iniciar sesión';
+  }
+});
+</script>
+</body>
+</html>

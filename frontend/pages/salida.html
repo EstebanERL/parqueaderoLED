@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salida · Parqueadero</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="../css/styles.css">
+</head><body>
+<div id="nav"></div>
+<div class="container">
+  <div class="page-head">
+    <div>
+      <h1><i class="fas fa-right-from-bracket" style="color:var(--danger)"></i> Registrar salida</h1>
+      <p class="lead">Busca la placa, aplica descuento si corresponde y genera el ticket de pago.</p>
+    </div>
+  </div>
+  <div class="card" style="max-width:620px">
+    <div id="msg"></div>
+    <label><i class="fas fa-magnifying-glass"></i> Buscar por placa</label>
+    <div style="display:flex;gap:10px;margin-bottom:6px">
+      <input id="placa" maxlength="10" style="text-transform:uppercase;letter-spacing:.15em;font-weight:700;text-align:center" placeholder="ABC123">
+      <button class="btn" id="btnBuscar"><i class="fas fa-search"></i> Buscar</button>
+    </div>
+    <div id="resultado"></div>
+  </div>
+  <div id="ticketBox"></div>
+</div>
+<script src="../js/api.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+requireAuth();
+renderNav('salida');
+
+const params = new URLSearchParams(location.search);
+if (params.get('placa')) {
+  document.getElementById('placa').value = params.get('placa');
+  setTimeout(buscar, 200);
+}
+
+document.getElementById('btnBuscar').addEventListener('click', buscar);
+
+async function buscar() {
+  const placa = document.getElementById('placa').value.toUpperCase().trim();
+  const res = document.getElementById('resultado');
+  res.innerHTML = '';
+  document.getElementById('msg').innerHTML = '';
+  if (!placa) return;
+  try {
+    const r = await api('/registros/placa/' + encodeURIComponent(placa));
+    res.innerHTML = `
+      <div style="background:var(--surface-soft);margin-top:18px;padding:20px;border-radius:14px;border:1px dashed var(--border-strong)">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+          <div><span style="color:var(--muted);font-size:.8rem">Placa</span><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.3rem;letter-spacing:.05em">${r.placa}</div></div>
+          <div><span style="color:var(--muted);font-size:.8rem">Tipo</span><div style="font-weight:600">${r.tipo}</div></div>
+          <div><span style="color:var(--muted);font-size:.8rem">Entrada</span><div style="font-weight:600">${fmtDate(r.hora_entrada)}</div></div>
+        </div>
+        <hr style="border:none;border-top:1px dashed var(--border-strong);margin:14px 0">
+        <label>Descuento (valor fijo)</label>
+        <input id="desc" type="number" min="0" value="0" style="margin-bottom:14px">
+        <button class="btn danger" id="btnSalida" style="width:100%;padding:13px"><i class="fas fa-receipt"></i> Confirmar salida y generar ticket</button>
+      </div>`;
+    document.getElementById('btnSalida').addEventListener('click', () => salida(r.id));
+  } catch (e) {
+    document.getElementById('msg').innerHTML = `<div class="error">${e.message}</div>`;
+  }
+}
+
+async function salida(id) {
+  try {
+    const descuento = Number(document.getElementById('desc').value || 0);
+    const { ticket } = await api('/registros/salida/' + id, {
+      method: 'POST', body: { descuento }
+    });
+    document.getElementById('resultado').innerHTML = '';
+    document.getElementById('ticketBox').innerHTML = renderTicket(ticket);
+  } catch (e) {
+    document.getElementById('msg').innerHTML = `<div class="error">${e.message}</div>`;
+  }
+}
+
+function renderTicket(t) {
+  return `
+    <div class="ticket" id="ticket">
+      <h3>🅿️ TICKET DE PAGO</h3>
+      <div class="line"><span>Código:</span><span>${t.codigo}</span></div>
+      <div class="line"><span>Placa:</span><b>${t.placa}</b></div>
+      <div class="line"><span>Entrada:</span><span>${fmtDate(t.hora_entrada)}</span></div>
+      <div class="line"><span>Salida:</span><span>${fmtDate(t.hora_salida)}</span></div>
+      <div class="line"><span>Tiempo:</span><span>${t.minutos_total} min</span></div>
+      <div class="line"><span>Subtotal:</span><span>${money(t.valor_bruto)}</span></div>
+      ${t.descuento > 0 ? `<div class="line"><span>Descuento:</span><span>-${money(t.descuento)}</span></div>` : ''}
+      <div class="line total"><span>TOTAL:</span><span>${money(t.total)}</span></div>
+    </div>
+    <div style="text-align:center">
+      <button class="btn" onclick="window.print()"><i class="fas fa-print"></i> Imprimir ticket</button>
+    </div>`;
+}
+</script>
+</body></html>
