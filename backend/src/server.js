@@ -17,7 +17,10 @@ const cupoRoutes = require('./routes/cupo.routes');
 
 const app = express();
 
-app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
+app.use(cors({
+  origin: "https://parqueadero-led-u86n.vercel.app"
+}));
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../../frontend')));
 
