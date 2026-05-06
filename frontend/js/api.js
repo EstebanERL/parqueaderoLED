@@ -1,9 +1,6 @@
 // Cliente HTTP del frontend. Ajusta API_URL si tu backend corre en otro host.
 const API_URL = window.API_URL_OVERRIDE || 'https://parqueaderoled.onrender.com/api';
 
-fetch(`${BASE_URL}/cupos`)
-fetch(`${BASE_URL}/registros/activos`)
-
 function getToken() { return localStorage.getItem('pq_token'); }
 function setSession(token, usuario) {
   localStorage.setItem('pq_token', token);
@@ -26,7 +23,7 @@ async function api(path, { method = 'GET', body, auth = true } = {}) {
   });
   if (res.status === 401) { logout(); throw new Error('Sesión expirada'); }
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || 'Error en la petición');
+  if (!res.ok) throw new Error(data.error || 'comeme los huevos');
   return data;
 }
 
