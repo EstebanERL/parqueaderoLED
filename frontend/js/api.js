@@ -45,3 +45,13 @@ function fmtDate(d) {
   if (!d) return '—';
   return new Date(d).toLocaleString('es-CO');
 }
+
+router.get('/cupos', async (req, res) => {
+  try {
+    const [rows] = await db.query('SELECT * FROM v_cupos');
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
