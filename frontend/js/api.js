@@ -1,5 +1,8 @@
 // Cliente HTTP del frontend. Ajusta API_URL si tu backend corre en otro host.
-const API_URL = window.API_URL_OVERRIDE || 'https://parqueaderoled.onrender.com';
+const API_URL = window.API_URL_OVERRIDE || 'https://parqueaderoled.onrender.com/api';
+
+fetch(`${BASE_URL}/cupos`)
+fetch(`${BASE_URL}/registros/activos`)
 
 function getToken() { return localStorage.getItem('pq_token'); }
 function setSession(token, usuario) {
@@ -46,12 +49,3 @@ function fmtDate(d) {
   return new Date(d).toLocaleString('es-CO');
 }
 
-router.get('/cupos', async (req, res) => {
-  try {
-    const [rows] = await db.query('SELECT * FROM v_cupos');
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});

@@ -41,7 +41,7 @@ requireAuth();
 renderNav('dashboard');
 
 async function cargar() {
-  const [cupos, activos] = await Promise.all([api('/cupos'), api('/registros/activos')]);
+  const [cupos, activos] = await Promise.all([api('/api/cupos'), api('/api/registros/activos')]);
   document.getElementById('cupos').innerHTML = cupos.map((c, idx) => {
     const tone = c.disponibles > 0 ? 'green' : 'amber';
     const isAuto = c.categoria === 'auto';
