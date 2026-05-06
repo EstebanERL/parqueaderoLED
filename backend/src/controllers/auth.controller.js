@@ -4,16 +4,19 @@ const { signToken } = require('../config/jwt');
 
 exports.login = async (req, res, next) => {
   try {
+    console.log("DB_HOST:", process.env.DB_HOST);
+
     const { email, password } = req.body;
     if (!email || !password)
       return res.status(400).json({ error: 'Email y password requeridos' });
 
     const [rows] = await db.query(
       `SELECT u.id, u.nombre, u.email, u.password_hash, u.activo, r.nombre AS rol
-         FROM usuarios u JOIN roles r ON r.id = u.rol_id
-        WHERE u.email = :email LIMIT 1`,
+       FROM usuarios u JOIN roles r ON r.id = u.rol_id
+       WHERE u.email = :email LIMIT 1`,
       { email }
     );
+    
     const user = rows[0];
     if (!user || !user.activo) return res.status(401).json({ error: 'Credenciales inválidas' });
 
