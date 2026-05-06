@@ -23,7 +23,7 @@ async function api(path, { method = 'GET', body, auth = true } = {}) {
   });
   if (res.status === 401) { logout(); throw new Error('Sesión expirada'); }
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || 'comeme los huevos');
+  if (!res.ok) throw new Error(data.error || 'Error en la solicitud');
   return data;
 }
 
