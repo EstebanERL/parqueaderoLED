@@ -29,6 +29,7 @@
           <i class="fas fa-check"></i> Registrar entrada
         </button>
       </form>
+      <div id="entradaTicketBox" style="margin-top:22px"></div>
     </div>
     <div class="card" style="background:var(--grad-dark);color:#cbd5e1;border:none">
       <h2 style="color:#fff"><i class="fas fa-circle-info" style="color:var(--primary-glow)"></i> Tips</h2>
@@ -41,6 +42,7 @@
   </div>
 </div>
 <script src="../js/api.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 <script src="../js/nav.js"></script>
 <script>
 requireAuth();
@@ -65,9 +67,34 @@ document.getElementById('form').addEventListener('submit', async (e) => {
     });
     msg.innerHTML = `<div class="success">Entrada registrada — placa <b>${r.placa}</b>${r.espacio_id ? ', espacio asignado' : ''}</div>`;
     document.getElementById('form').reset();
+    document.getElementById('entradaTicketBox').innerHTML = renderEntryTicket(r);
   } catch (err) {
     msg.innerHTML = `<div class="error">${err.message}</div>`;
   }
 });
+
+function renderEntryTicket(reg) {
+  const qrData = JSON.stringify({ placa: reg.placa, entradaId: reg.id });
+  setTimeout(() => {
+    const canvas = document.getElementById('entradaQrCanvas');
+    if (canvas) {
+      QRCode.toCanvas(canvas, qrData, { width: 180, margin: 2 });
+    }
+  }, 50);
+
+  return `
+    <div class="ticket" style="margin-top:16px;padding:18px;">
+      <h3>🅿️ TICKET DE ENTRADA</h3>
+      <div class="line"><span>Placa:</span><b>${reg.placa}</b></div>
+      <div class="line"><span>Tipo ID:</span><span>${reg.tipo_vehiculo_id}</span></div>
+      <div class="line"><span>Entrada:</span><span>${new Date(reg.hora_entrada).toLocaleString('es-CO')}</span></div>
+      ${reg.espacio_id ? `<div class="line"><span>Espacio:</span><span>${reg.espacio_id}</span></div>` : ''}
+      <div style="text-align:center;margin-top:20px">
+        <canvas id="entradaQrCanvas"></canvas>
+        <p style="font-size:.8rem;color:gray">Escanea este QR en salida</p>
+      </div>
+    </div>
+  `;
+}
 </script>
 </body></html>
