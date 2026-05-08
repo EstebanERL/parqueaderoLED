@@ -68,7 +68,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
 
   try {
-    const API_URL = "https://parqueaderoled.onrender.com";
+    const API_URL = window.API_URL_OVERRIDE || '';
 
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;

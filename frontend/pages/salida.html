@@ -16,16 +16,34 @@
   <div class="card" style="max-width:620px">
     <div id="msg"></div>
     <label><i class="fas fa-magnifying-glass"></i> Buscar por placa</label>
-    <div style="display:flex;gap:10px;margin-bottom:6px">
-      <input id="placa" maxlength="10" style="text-transform:uppercase;letter-spacing:.15em;font-weight:700;text-align:center" placeholder="ABC123">
-      <button class="btn" id="btnBuscar"><i class="fas fa-search"></i> Buscar</button>
-    </div>
+
+
+
+    <div style="display:flex;gap:10px;margin-bottom:6px;flex-wrap:wrap">
+  <input id="placa" maxlength="10"
+    style="text-transform:uppercase;letter-spacing:.15em;font-weight:700;text-align:center"
+    placeholder="ABC123">
+
+  <button class="btn" id="btnBuscar">
+    <i class="fas fa-search"></i> Buscar
+  </button>
+
+  <button class="btn success" onclick="document.getElementById('qrInput').click()">
+    <i class="fas fa-qrcode"></i> Escanear QR
+  </button>
+
+  <input type="file" id="qrInput" accept="image/*" style="display:none">
+</div>
+
+
     <div id="resultado"></div>
   </div>
   <div id="ticketBox"></div>
 </div>
 <script src="../js/api.js"></script>
 <script src="../js/nav.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.min.js"></script>
 <script>
 requireAuth();
 renderNav('salida');
@@ -78,9 +96,25 @@ async function salida(id) {
 }
 
 function renderTicket(t) {
+  const qrData = JSON.stringify({
+    placa: t.placa,
+    codigo: t.codigo
+  });
+
+  setTimeout(() => {
+    const canvas = document.getElementById('qrCanvas');
+    if (canvas) {
+      QRCode.toCanvas(canvas, qrData, {
+        width: 180,
+        margin: 2
+      });
+    }
+  }, 100);
+
   return `
     <div class="ticket" id="ticket">
       <h3>🅿️ TICKET DE PAGO</h3>
+
       <div class="line"><span>Código:</span><span>${t.codigo}</span></div>
       <div class="line"><span>Placa:</span><b>${t.placa}</b></div>
       <div class="line"><span>Entrada:</span><span>${fmtDate(t.hora_entrada)}</span></div>
@@ -89,10 +123,57 @@ function renderTicket(t) {
       <div class="line"><span>Subtotal:</span><span>${money(t.valor_bruto)}</span></div>
       ${t.descuento > 0 ? `<div class="line"><span>Descuento:</span><span>-${money(t.descuento)}</span></div>` : ''}
       <div class="line total"><span>TOTAL:</span><span>${money(t.total)}</span></div>
+
+      <div style="text-align:center;margin-top:20px">
+        <canvas id="qrCanvas"></canvas>
+        <p style="font-size:.8rem;color:gray">Escanea para buscar vehículo</p>
+      </div>
     </div>
+
     <div style="text-align:center">
-      <button class="btn" onclick="window.print()"><i class="fas fa-print"></i> Imprimir ticket</button>
-    </div>`;
+      <button class="btn" onclick="window.print()">
+        <i class="fas fa-print"></i> Imprimir ticket
+      </button>
+    </div>
+  `;
 }
+
+document.getElementById('qrInput').addEventListener('change', async function (e) {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  const loadPromise = new Promise((resolve, reject) => {
+    img.onload = () => resolve();
+    img.onerror = () => reject(new Error('No se pudo cargar la imagen'));
+    img.src = url;
+  });
+
+  try {
+    await loadPromise;
+    const canvas = document.createElement('canvas');
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(imageData.data, imageData.width, imageData.height);
+    if (!code) throw new Error('No se detectó un QR válido');
+
+    const data = JSON.parse(code.data);
+    if (!data.placa) throw new Error('QR no contiene placa');
+
+    document.getElementById('placa').value = data.placa;
+    buscar();
+  } catch (err) {
+    alert(err.message || 'QR inválido');
+  }
+});
+
+
 </script>
 </body></html>
